@@ -1,8 +1,8 @@
 (* FABulous, BelMap,
-C_bit0=0,
-C_bit1=1,
-C_bit2=2,
-C_bit3=3
+INIT0=0,
+INIT1=1,
+INIT2=2,
+INIT3=3
 *)
 module Config_access #(parameter NoConfigBits = 4)(
     // ConfigBits has to be adjusted manually (we don't use an arithmetic parser for the value)

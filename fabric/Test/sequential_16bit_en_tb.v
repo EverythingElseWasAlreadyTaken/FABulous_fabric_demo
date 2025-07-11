@@ -1,9 +1,9 @@
 `timescale 1ps/1ps
 module sequential_16bit_en_tb;
-    wire [27:0] I_top;
-    wire [27:0] T_top;
-    reg [27:0] O_top = 0;
-    wire [55:0] A_cfg, B_cfg;
+    wire [15:0] I_top;
+    wire [15:0] T_top;
+    reg [15:0] O_top = 0;
+    wire [31:0] A_cfg, B_cfg;
 
     reg CLK = 1'b0;
     reg resetn = 1'b1;
@@ -31,7 +31,7 @@ module sequential_16bit_en_tb;
     );
 
 
-    wire [27:0] I_top_gold, oeb_gold, T_top_gold;
+    wire [15:0] I_top_gold, oeb_gold, T_top_gold;
     sequential_16bit_en dut_i (
         .clk(CLK),
         .io_out(I_top_gold),
