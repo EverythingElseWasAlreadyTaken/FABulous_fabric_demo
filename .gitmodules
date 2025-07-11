@@ -1,0 +1,4 @@
+[submodule "FABulous"]
+	path = FABulous
+	url = git@github.com:FPGA-Research/FABulous.git
+	branch = FABulous2.0-development
