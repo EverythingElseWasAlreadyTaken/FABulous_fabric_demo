@@ -1,0 +1,5 @@
+inquirer==3.4.0
+loguru==0.7.3
+pyftdi==0.56.0
+pyserial==3.5
+pyudev==0.24.3
