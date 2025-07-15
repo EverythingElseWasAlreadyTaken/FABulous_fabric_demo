@@ -4,7 +4,7 @@ This is a simple FABulous fabric demo of a 10x10 fabric.
 It contains 56 LUT4AB tiles with 8 LUT4s each, 8 register file tiles and 8 W_IO tiles with
 2 I/O for tri-state output each and 8 config_access bits each.
 
-See [fabric/fabric.csv](fabric/farbic.csv) for more details on fabric tiles.
+See [fabric/fabric.csv](fabric/fabric.csv) for more details on fabric tiles.
 
 Take a look at the [FABulous documentation](https://fabulous.readthedocs.io/en/fabulous2.0-development/) to find out more about the FABulus framework.
 
