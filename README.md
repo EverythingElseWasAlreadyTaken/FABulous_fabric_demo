@@ -1,19 +1,28 @@
 # FABulous fabric demo
 
-This is a simple FABulous fabric demo of a 10x10 fabric.
-It contains 56 LUT4AB tiles with 8 LUT4s each, 8 register file tiles and 8 W_IO tiles with
-2 I/O for tri-state output each and 8 config_access bits each.
-
-See [fabric/fabric.csv](fabric/farbic.csv) for more details on fabric tiles.
+This repository contains some simple FABulous demo fabrics.
 
 Take a look at the [FABulous documentation](https://fabulous.readthedocs.io/en/fabulous2.0-development/) to find out more about the FABulus framework.
 
 ## Folder structure
 
-- **FABulous_demo_diff**
+- **FABulous_fabric_demo**
   - **FABulous** - Git submodule with the used version of the FABulous framework
-  - **fabric** - FABulous project, containing the generated FPGA farbic and a demo user design
+  - **fabric_10x10** - FABulous project, containing the generated FPGA fabric and a demo user design
+    - 10x10 Tiles
+    - 56 LUT4AB tiles(8 LUT4 each) = 448 LUT4
+    - 8 register file tiles
+    - 8 W_IO tiles on the WEST side of the fabric (2 I/O for tri-state output + 8 config_access bits each)
+    - See [fabric_10x10/fabric.csv](fabric_10x10/farbic.csv) for more details on fabric tiles.
+  - **fabric_32x11** - FABulous project, containing the generated FPGA fabric and a demo user design
+    - 32x11 Tiles
+    - 252 LUT4AB tiles(8 LUT4 each) = 2016 LUT4
+    - 18 register file tiles
+    - 28 N_IO tiles (1 INPUT and 1 OUTPUT each)
+    - See [fabric_32x11/fabric.csv](fabric_32x10/farbic.csv) for more details on fabric tiles.
+
   - **vivado_emulation** - emulation setup for the FABulous fabric on a Digilent Nexys Video board
+    - Based on fabric_10x10
 
 ## Setup
 

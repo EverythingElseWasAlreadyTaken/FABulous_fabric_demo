@@ -1,0 +1,53 @@
+{
+  "creator": "Yosys 0.55+0 (git sha1 1a215719e, g++ 15.1.1 -march=x86-64 -mtune=generic -O2 -fno-plt -fexceptions -fstack-clash-protection -fcf-protection -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/home/jart/.cache/yay/yosys-nightly/src=/usr/src/debug/yosys-nightly -flto=auto -fPIC -O3)",
+  "modules": {
+    "Config_access": {
+      "attributes": {
+        "INIT3": 3,
+        "INIT2": 2,
+        "INIT1": 1,
+        "INIT0": 0,
+        "BelMap": 1,
+        "FABulous": 1,
+        "dynports": 1,
+        "cells_not_processed": 1,
+        "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric/Tile/W_IO/Config_access.v:7.1-17.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": 4
+      },
+      "ports": {
+        "C_bit": {
+          "direction": "output",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "C_bit": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "EXTERNAL": 1,
+            "FABulous": 1,
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric/Tile/W_IO/Config_access.v:10.42-10.47"
+          }
+        },
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "FABulous": 1,
+            "GLOBAL": 1,
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric/Tile/W_IO/Config_access.v:12.52-12.62"
+          }
+        }
+      }
+    }
+  }
+}

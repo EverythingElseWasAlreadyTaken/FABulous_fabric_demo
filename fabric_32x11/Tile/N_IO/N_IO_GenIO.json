@@ -1,0 +1,68 @@
+{
+  "creator": "Yosys 0.55+0 (git sha1 1a215719e, g++ 15.1.1 -march=x86-64 -mtune=generic -O2 -fno-plt -fexceptions -fstack-clash-protection -fcf-protection -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/home/jart/.cache/yay/yosys-nightly/src=/usr/src/debug/yosys-nightly -flto=auto -fPIC -O3)",
+  "modules": {
+    "N_IO_GenIO": {
+      "attributes": {
+        "cells_not_processed": 1,
+        "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric_11x32/Tile/N_IO/N_IO_GenIO.v:4.1-19.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": 0
+      },
+      "ports": {
+        "NIO_O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "NIO_I": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "NIO_O_top": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "NIO_I_top": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "NIO_I": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric_11x32/Tile/N_IO/N_IO_GenIO.v:10.16-10.21"
+          }
+        },
+        "NIO_I_top": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "EXTERNAL": 1,
+            "FABulous": 1,
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric_11x32/Tile/N_IO/N_IO_GenIO.v:12.42-12.51"
+          }
+        },
+        "NIO_O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric_11x32/Tile/N_IO/N_IO_GenIO.v:9.17-9.22"
+          }
+        },
+        "NIO_O_top": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "EXTERNAL": 1,
+            "FABulous": 1,
+            "src": "/home/jart/work/uni/FABulous_fabric_demo/fabric_11x32/Tile/N_IO/N_IO_GenIO.v:11.41-11.50"
+          }
+        }
+      }
+    }
+  }
+}
