@@ -22,32 +22,34 @@ If you want to setup the emulation environment yourself, follow the steps below.
    > <https://digilent.com/reference/programmable-logic/guides/installing-vivado-and-vitis>
 2. Launch Vivado and Create a new project in Vivado
 3. Add the `../fabric/` directory to the design sources.
-   > [!Note]
-   > Make sure the `Add sources from subdirectories` box is checked.
-   > You can decide if you want to check `Copy sources into project` on your
-   > personal preference. If you're unsure just leave it unchecked.
-4. Add the `./top.v` file as a design source.
-5. Add the files in `./constraints` to the constraints sources.
-6. Choose the Nexys Video board as your target board
-7. After creating the project, set `efpga_loops.xdc` for implementation only in the source file
+
+> [!NOTE]
+> Make sure the `Add sources from subdirectories` box is checked.   
+> You can decide if you want to check `Copy sources into project` on your
+> personal preference. If you're unsure just leave it unchecked.
+    
+5. Add the `./top.v` file as a design source.
+6. Add the files in `./constraints` to the constraints sources.
+7. Choose the Nexys Video board as your target board
+8. After creating the project, set `efpga_loops.xdc` for implementation only in the source file
    properties.
-8. Make sure that `top.v` is set as the top module.
-9. We recommend running the synthesis for all tiles as Out-of-Context, since
+9. Make sure that `top.v` is set as the top module.
+10. We recommend running the synthesis for all tiles as Out-of-Context, since
    this drastically reduces the synthesis time.
    For this, select all Tiles and the block RAM instances in the `Sources` view
    and right click on them. Then select `Set Out-of-Context for Synthesis...` in
    the dialog.
-10. Run the clocking wizard to create the clock constraints.
+11. Run the clocking wizard to create the clock constraints.
 
-    > [!Note]
-    > Make sure to set the clock period 10 MHz
-    > Make sure the names of the clk ports match the constraints and the top.v
+> [!NOTE]
+> Make sure to set the clock period 10 MHz
+> Make sure the names of the clk ports match the constraints and the top.v
 
-11. Generate the bitstream by clicking on the `Generate Bitstream` button in the Flow Navigator.
+12. Generate the bitstream by clicking on the `Generate Bitstream` button in the Flow Navigator.
     This will take a while, so be patient.
-12. Program the FPGA with the Hardware Manager.
-13. Now the heartbeat LED (LED0) should blink.
-14. Program the emulated FPGA fabric with the `upload_bitstream/board.py` script.
+13. Program the FPGA with the Hardware Manager.
+14. Now the heartbeat LED (LED0) should blink.
+15. Program the emulated FPGA fabric with the `upload_bitstream/board.py` script.
 
 ## Programming the emulated FPGA fabric
 
