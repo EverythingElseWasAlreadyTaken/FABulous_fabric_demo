@@ -85,6 +85,8 @@ If you want to set up the emulation environment yourself, follow the steps below
 
 ## Programming the emulated FPGA fabric
 
+First, make sure that a cable is also plugged into the `UART` port of the board. 
+
 Go to the `upload_bitstream` directory in this project.
 
 ```
