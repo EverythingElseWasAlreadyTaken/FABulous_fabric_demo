@@ -32,7 +32,7 @@ as git submodule.
 To clone the repository with the FABulous submodule, use:
 
 ```bash
-git clone https://github.com/EverythingElseWasAlreadyTaken/FABulous_demo_diff.git --recurse-submodules
+git clone https://github.com/EverythingElseWasAlreadyTaken/FABulous_fabric_demo.git --recurse-submodules
 ```
 
 Follow the [FABulous Quick Start Guide](https://fabulous.readthedocs.io/en/fabulous2.0-development/Usage.html) to set up FABulous.
