@@ -11,18 +11,39 @@ But this can be done similarly with any other FPGA board.
 
 The `FABulous_fabric_emulation.xpr.7z` contains an archived Vivado project (compressed with 7zip)
 for the Nexys Video Board, which is used to emulate the FPGA fabric.
-If you just want to run the emulation, extract it and flash the Bitstream to your board.
+If you just want to run the emulation, extract it and flash the bitstream to your board. We also provide the bitstreams for each fabric in the respective directory. You can use [OpenFPGALoader](https://github.com/trabucayre/openFPGALoader) to upload the bitstream with the following command:
+
+```
+openFPGALoader -b nexysVideo <vivado_bitfile>
+```
+
+If you want to store the bitstream persistently in the flash, add the `-f`
+option before the bitfile:
+
+```
+openFPGALoader -b nexysVideo -f <vivado_bitfile>
+```
+
+> [!NOTE] 
+> This only uploads the bitstream of the FABulous fabric itself to the 
+> board. Skip to 
+["Programming the emulated FPGA fabric"](#programming-the-emulated-fpga-fabric)
+> to learn how to upload a bitstream to the emulated FABulous fabric.
+
+Of course, you can also use the `Hardware Manager` inside Vivado to upload the
+given bitfiles.
+
 After that, you can use the `upload_bitstream/board.py` script to upload the bitstream
 to the emulated FPGA fabric.
 
-If you want to setup the emulation environment yourself, follow the steps below.
+If you want to set up the emulation environment yourself, follow the steps below.
 
-# Setup the emulation environment
+# Set up the emulation environment
 
-1. Setup Vivado according to the Digilent tutorial:
+1. Set up Vivado according to the Digilent tutorial:
    > <https://digilent.com/reference/programmable-logic/guides/installing-vivado-and-vitis>
 2. Launch Vivado and create a new project in Vivado
-3. Add the `../fabric/` directory of the fabric you want to emulate to the design sources.
+3. Add the `../fabric/Fabric/` and `../fabric/Tiles/` directories of the fabric you want to emulate to the design sources.
 
 > [!NOTE]
 > Make sure the `Add sources from subdirectories` box is checked.   
@@ -40,6 +61,8 @@ If you want to setup the emulation environment yourself, follow the steps below.
    For this, select all Tiles and the block RAM instances in the `Sources` view
    and right click on them. Then select `Set Out-of-Context for Synthesis...` in
    the dialog. You can also select all of them at once.
+   We also recommend disabling the `phys_opt_design` step of the
+   implementation. This is done under `Settings -> Implementation ->
 11. Run the clocking wizard to create the clock constraints.
 
 > [!NOTE]
@@ -83,8 +106,8 @@ Then you can use the `board.py` script to upload the bitstream to the emulated F
 `led[0]` should always blink, indicating that the upload was successful.
 `led[1]` should blink when the upload of the bitstream is in progress.
 
-The sequential_16bit_en is a counter example that is mapped to `led[7:2]` of the
-nexys-video board. They have an enable and a reset, mapped to the dip switches `sw[1:0]`
+The `sequential_16bit_en` is a counter example that is mapped to `led[7:2]` of the
+Nexys Video board. It has an enable and a reset mapped to the dip switches `sw[1:0]`
 of the board. To enable the counter set `sw[1]` and for reset set `sw[0]`.
 `sw[2]` is a global reset.
 Check the constraints file `constraints/Nexys_Video_Master.xdc` for more information on the pin mappings
