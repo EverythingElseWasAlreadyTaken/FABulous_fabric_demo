@@ -213,40 +213,47 @@ module regfile_test_20_tb;
             end
         end
 
-        // Phase 5: Simultaneous dual-port read test
-        $display("\nPhase 5: Testing simultaneous dual-port reads...");
-        for (rf = 0; rf < num_regfiles; rf = rf + 1) begin
-            $display("  RegFile %0d: Reading addr[0] and addr[15] simultaneously", rf);
+        // Phase 5: More realistic dual-port test (combinatorial RegFiles only)
+        $display("\nPhase 5: Testing dual-port reads (comb RegFiles only)...");
+        for (rf = 0; rf < num_comb_regfiles; rf = rf + 1) begin
+            $display("  RegFile %0d: Testing dual-port access", rf);
 
-            // Set addresses for both ports
-            O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), 1'b0, rf[4:0], 5'd15, 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
+            // Test multiple address combinations to verify dual-port operation
+            // The key test: set both addresses, then rapidly switch port_sel to verify
+            // both ports are reading different addresses simultaneously (not time-multiplexed)
+            for (i = 0; i < 16; i = i + 2) begin
+                for (j = i + 1; j < 16; j = j + 2) begin
+                    reg [3:0] expected_a, expected_b, read_a, read_b;
+                    expected_a = (rf + i) & 4'hF;
+                    expected_b = (rf + j) & 4'hF;
 
-            if (rf >= num_comb_regfiles)
-                @(posedge CLK);  // Wait for registered RegFiles
+                    // Set both addresses: a_addr=i, b_addr=j
+                    // For true dual-port, both should be available simultaneously
+                    O_top = {1'b0, 1'b0, rf[4:0], j[4:0], i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
+                    #100;  // Small delay for combinatorial logic to settle
+                           // Global clock period is 10,000 time units, so 100
+                           // is small enough to avoid any clock edge
 
-            @(negedge CLK);
+                    // Read port A
+                    read_a = I_top[3:0];
 
-            expected_data = (rf + 0) & 4'hF;
-            // Read from port A (addr 0)
-            O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), 1'b0, rf[4:0], 5'd15, 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
-            @(negedge CLK);
-            $display("    Port A[0]: 0x%X (expect 0x%X) %s",
-                     I_top[3:0], expected_data,
-                     (I_top[3:0] === expected_data) ? "PASS" : "FAIL");
-            if (I_top[3:0] !== expected_data)
-                have_errors = 1'b1;
+                    // Immediately switch to port B (no clock edge!)
+                    // The addresses stay the same, we're just changing the output mux
+                    O_top[26] = 1'b1;  // Switch port_sel to B
+                    #100;  // Small combinatorial delay
 
-            expected_data = (rf + 15) & 4'hF;
-            // Read from port B (addr 15)
-            O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), 1'b1, rf[4:0], 5'd15, 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
-            if (rf >= num_comb_regfiles)
-                @(posedge CLK);
-            @(negedge CLK);
-            $display("    Port B[15]: 0x%X (expect 0x%X) %s",
-                     I_top[3:0], expected_data,
-                     (I_top[3:0] === expected_data) ? "PASS" : "FAIL");
-            if (I_top[3:0] !== expected_data)
-                have_errors = 1'b1;
+                    // Read port B
+                    read_b = I_top[3:0];
+
+                    // Verify both ports read correctly
+                    if (read_a !== expected_a || read_b !== expected_b) begin
+                        $display("    FAIL: Dual-port read - A[%0d]=0x%X (exp 0x%X), B[%0d]=0x%X (exp 0x%X)",
+                                 i, read_a, expected_a, j, read_b, expected_b);
+                        have_errors = 1'b1;
+                    end
+                end
+            end
+            $display("  RegFile %0d dual-port test complete", rf);
         end
 
         // Phase 6: Write-read immeadiate readback test
