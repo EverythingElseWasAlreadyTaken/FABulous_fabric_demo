@@ -23,12 +23,13 @@ module regfile_test_20 #(
     // io_in[15:11] = read address A (5 bits, 0-31)
     // io_in[20:16] = read address B (5 bits, 0-31)
     // io_in[25:21] = RegFile select for write/read (5 bits, 0-NUM_REGFILES-1)
-    // io_in[26]    = read port select (0=A, 1=B)
-    // io_in[27]    = read mode select (0=combinational, 1=registered)
+    // io_in[26]    = read mode select for port A (0=combinational, 1=registered)
+    // io_in[27]    = read mode select for port B (0=combinational, 1=registered)
     //
-    // io_out[3:0]  = read data from selected RegFile and port
-    // io_out[8:4]  = echo RegFile select
-    // io_out[27:9] = unused
+    // io_out[3:0]  = read data from port A of selected RegFile
+    // io_out[7:4]  = read data from port B of selected RegFile
+    // io_out[12:8] = echo RegFile select
+    // io_out[27:13] = unused
 
     wire reset = io_in[0];
     wire w_en = io_in[1];
@@ -37,8 +38,8 @@ module regfile_test_20 #(
     wire [4:0] a_addr = io_in[15:11];
     wire [4:0] b_addr = io_in[20:16];
     wire [4:0] rf_sel = io_in[25:21];
-    wire port_sel = io_in[26];
-    wire mode_sel = io_in[27];
+    wire mode_sel_a = io_in[26];
+    wire mode_sel_b = io_in[27];
 
     // Output arrays for NUM_REGFILES RegFiles
     wire [3:0] ad_comb [0:19];  // Combinational read port A (max 20)
@@ -217,34 +218,41 @@ module regfile_test_20 #(
 
 `endif
 
-    // Output muxing - select RegFile, port, and mode
-    reg [3:0] selected_data;
+    // Output muxing - select RegFile and mode for BOTH ports simultaneously
+    reg [3:0] selected_data_a;
+    reg [3:0] selected_data_b;
 
     always @(*) begin
         if (rf_sel < NUM_REGFILES) begin
-            if (mode_sel) begin
-                // Registered mode
-                if (port_sel)
-                    selected_data = bd_reg[rf_sel];
-                else
-                    selected_data = ad_reg[rf_sel];
+            // Port A selection
+            if (mode_sel_a) begin
+                // Registered mode for port A
+                selected_data_a = ad_reg[rf_sel];
             end else begin
-                // Combinational mode
-                if (port_sel)
-                    selected_data = bd_comb[rf_sel];
-                else
-                    selected_data = ad_comb[rf_sel];
+                // Combinational mode for port A
+                selected_data_a = ad_comb[rf_sel];
+            end
+
+            // Port B selection
+            if (mode_sel_b) begin
+                // Registered mode for port B
+                selected_data_b = bd_reg[rf_sel];
+            end else begin
+                // Combinational mode for port B
+                selected_data_b = bd_comb[rf_sel];
             end
         end else begin
-            selected_data = 4'b0;
+            selected_data_a = 4'b0;
+            selected_data_b = 4'b0;
         end
     end
 
-    // Pack outputs
+    // Pack outputs - both ports available simultaneously
     assign io_out = {
-        19'h00000,       // [27:9] unused
-        rf_sel,          // [8:4] echo RegFile select
-        selected_data    // [3:0] read data
+        15'h0000,         // [27:13] unused
+        rf_sel,           // [12:8] echo RegFile select
+        selected_data_b,  // [7:4] read data from port B
+        selected_data_a   // [3:0] read data from port A
     };
 
 endmodule

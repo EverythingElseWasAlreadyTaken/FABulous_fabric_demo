@@ -113,7 +113,10 @@ module regfile_test_20_tb;
                  num_reg_regfiles, num_comb_regfiles, num_regfiles-1);
 
         // Test sequence format:
-        // O_top = {mode_sel[27], port_sel[26], rf_sel[25:21], b_addr[20:16], a_addr[15:11], w_data[10:7], w_addr[6:2], w_en[1], reset[0]}
+        // O_top = {mode_sel_b[27], mode_sel_a[26], rf_sel[25:21], b_addr[20:16], a_addr[15:11], w_data[10:7], w_addr[6:2], w_en[1], reset[0]}
+        // I_top[3:0]  = port A data
+        // I_top[7:4]  = port B data
+        // I_top[12:8] = echo rf_sel
 
         // Phase 1: Reset
         O_top = 28'h0000001;
@@ -148,10 +151,10 @@ module regfile_test_20_tb;
         for (rf = 0; rf < num_comb_regfiles; rf = rf + 1) begin
             $display("  Testing RegFile %0d (combinatorial):", rf);
 
-            // Test port A
+            // Test both ports sequentially (single port at a time for basic verification)
             for (i = 0; i < 16; i = i + 1) begin
                 expected_data = (rf + i) & 4'hF;
-                // mode_sel=0 (comb), port_sel=0 (A), rf_sel=rf, a_addr=i
+                // mode_sel_a=0 (comb), mode_sel_b=0 (comb), rf_sel=rf, a_addr=i, b_addr=0
                 O_top = {1'b0, 1'b0, rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
                 @(negedge CLK);
                 $display("    Port A addr[%0d]: fabric=0x%X gold=0x%X expect=0x%X %s",
@@ -161,16 +164,15 @@ module regfile_test_20_tb;
                     have_errors = 1'b1;
             end
 
-            // Test port B
             for (i = 0; i < 16; i = i + 1) begin
                 expected_data = (rf + i) & 4'hF;
-                // mode_sel=0 (comb), port_sel=1 (B), rf_sel=rf, b_addr=i
-                O_top = {1'b0, 1'b1, rf[4:0], i[4:0], 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
+                // mode_sel_a=0 (comb), mode_sel_b=0 (comb), rf_sel=rf, a_addr=0, b_addr=i
+                O_top = {1'b0, 1'b0, rf[4:0], i[4:0], 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
                 @(negedge CLK);
                 $display("    Port B addr[%0d]: fabric=0x%X gold=0x%X expect=0x%X %s",
-                         i, I_top[3:0], I_top_gold[3:0], expected_data,
-                         (I_top[3:0] === expected_data) ? "PASS" : "FAIL");
-                if (I_top[3:0] !== expected_data)
+                         i, I_top[7:4], I_top_gold[7:4], expected_data,
+                         (I_top[7:4] === expected_data) ? "PASS" : "FAIL");
+                if (I_top[7:4] !== expected_data)
                     have_errors = 1'b1;
             end
         end
@@ -185,8 +187,8 @@ module regfile_test_20_tb;
             // Test port A
             for (i = 0; i < 16; i = i + 1) begin
                 expected_data = (rf + i) & 4'hF;
-                // mode_sel=1 (reg), port_sel=0 (A), rf_sel=rf, a_addr=i
-                O_top = {1'b1, 1'b0, rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
+                // mode_sel_a=1 (reg), mode_sel_b=1 (reg), rf_sel=rf, a_addr=i, b_addr=0
+                O_top = {1'b1, 1'b1, rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
                 @(posedge CLK);  // Wait for registered output
                 @(negedge CLK);
                 $display("    Port A addr[%0d]: fabric=0x%X gold=0x%X expect=0x%X %s",
@@ -199,64 +201,53 @@ module regfile_test_20_tb;
             // Test port B
             for (i = 0; i < 16; i = i + 1) begin
                 expected_data = (rf + i) & 4'hF;
-                // mode_sel=1 (reg), port_sel=1 (B), rf_sel=rf, b_addr=i
+                // mode_sel_a=1 (reg), mode_sel_b=1 (reg), rf_sel=rf, a_addr=0, b_addr=i
                 O_top = {1'b1, 1'b1, rf[4:0], i[4:0], 5'd0, 4'd0, 5'd0, 1'b0, 1'b0};
                 @(posedge CLK);  // Wait for registered output
                 @(negedge CLK);
 
                 $display("    Port B addr[%0d]: fabric=0x%X gold=0x%X expect=0x%X %s",
-                         i, I_top[3:0], I_top_gold[3:0], expected_data,
-                         (I_top[3:0] === expected_data) ? "PASS" : "FAIL");
+                         i, I_top[7:4], I_top_gold[7:4], expected_data,
+                         (I_top[7:4] === expected_data) ? "PASS" : "FAIL");
 
-                if (I_top[3:0] !== expected_data)
+                if (I_top[7:4] !== expected_data)
                     have_errors = 1'b1;
             end
         end
 
-        // Phase 5: More realistic dual-port test (combinatorial RegFiles only)
-        $display("\nPhase 5: Testing dual-port reads (comb RegFiles only)...");
+        // Phase 5: True simultaneous dual-port read test (combinatorial RegFiles only)
+        $display("\nPhase 5: Testing TRUE simultaneous dual-port reads (comb RegFiles only)...");
         for (rf = 0; rf < num_comb_regfiles; rf = rf + 1) begin
-            $display("  RegFile %0d: Testing dual-port access", rf);
+            $display("  RegFile %0d: Testing simultaneous dual-port access", rf);
 
-            // Test multiple address combinations to verify dual-port operation
-            // The key test: set both addresses, then rapidly switch port_sel to verify
-            // both ports are reading different addresses simultaneously (not time-multiplexed)
+            // Test multiple address combinations with BOTH ports reading simultaneously
+            // Both outputs are available at the same time - no multiplexing needed!
             for (i = 0; i < 16; i = i + 2) begin
                 for (j = i + 1; j < 16; j = j + 2) begin
-                    reg [3:0] expected_a, expected_b, read_a, read_b;
+                    reg [3:0] expected_a, expected_b;
                     expected_a = (rf + i) & 4'hF;
                     expected_b = (rf + j) & 4'hF;
 
                     // Set both addresses: a_addr=i, b_addr=j
-                    // For true dual-port, both should be available simultaneously
+                    // mode_sel_a=0 (comb), mode_sel_b=0 (comb)
                     O_top = {1'b0, 1'b0, rf[4:0], j[4:0], i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
                     #100;  // Small delay for combinatorial logic to settle
-                           // Global clock period is 10,000 time units, so 100
+                           // Global clock period is 10,000 time units, so 100ps
                            // is small enough to avoid any clock edge
 
-                    // Read port A
-                    read_a = I_top[3:0];
-
-                    // Immediately switch to port B (no clock edge!)
-                    // The addresses stay the same, we're just changing the output mux
-                    O_top[26] = 1'b1;  // Switch port_sel to B
-                    #100;  // Small combinatorial delay
-
-                    // Read port B
-                    read_b = I_top[3:0];
-
-                    // Verify both ports read correctly
-                    if (read_a !== expected_a || read_b !== expected_b) begin
-                        $display("    FAIL: Dual-port read - A[%0d]=0x%X (exp 0x%X), B[%0d]=0x%X (exp 0x%X)",
-                                 i, read_a, expected_a, j, read_b, expected_b);
+                    // Read BOTH ports simultaneously - true dual-port!
+                    // I_top[3:0] = port A, I_top[7:4] = port B
+                    if (I_top[3:0] !== expected_a || I_top[7:4] !== expected_b) begin
+                        $display("    FAIL: Simultaneous dual-port read - A[%0d]=0x%X (exp 0x%X), B[%0d]=0x%X (exp 0x%X)",
+                                 i, I_top[3:0], expected_a, j, I_top[7:4], expected_b);
                         have_errors = 1'b1;
                     end
                 end
             end
-            $display("  RegFile %0d dual-port test complete", rf);
+            $display("  RegFile %0d dual-port test complete - tested %0d address pairs", rf, 8*7/2);
         end
 
-        // Phase 6: Write-read immeadiate readback test
+        // Phase 6: Write-read immediate readback test
         $display("\nPhase 6: Testing write-read timing for immediate readback (addresses 16-31)...");
         for (rf = 0; rf < num_regfiles; rf = rf + 1) begin
             $display("  Testing RegFile %0d...", rf);
@@ -268,7 +259,8 @@ module regfile_test_20_tb;
                 @(posedge CLK);
 
                 // Immediately read back (combinatorial for rf<num_comb, registered for rf>=num_comb)
-                O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), 1'b0, rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
+                // mode_sel_a = appropriate for RegFile type, mode_sel_b = same
+                O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), (rf >= num_comb_regfiles ? 1'b1 : 1'b0), rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
                 if (rf >= num_comb_regfiles)
                     @(posedge CLK);
                 @(negedge CLK);
@@ -282,21 +274,20 @@ module regfile_test_20_tb;
             $display("  RegFile %0d complete", rf);
         end
 
-        // Phase 7: Final fabric vs gold comparison
+        // Phase 7: Final fabric vs gold comparison (using dual-port reads)
         $display("\nPhase 7: Final fabric vs gold comparison...");
         for (rf = 0; rf < num_regfiles; rf = rf + 1) begin
             reg rf_errors;
             rf_errors = 1'b0;
             $display("  Comparing RegFile %0d...", rf);
             for (i = 0; i < 32; i = i + 1) begin
-                // Read from port A
-                O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), 1'b0, rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
+                // Read from port A (also reads port B but we only check port A here)
+                O_top = {(rf >= num_comb_regfiles ? 1'b1 : 1'b0), (rf >= num_comb_regfiles ? 1'b1 : 1'b0), rf[4:0], 5'd0, i[4:0], 4'd0, 5'd0, 1'b0, 1'b0};
                 if (rf >= num_comb_regfiles)
                     @(posedge CLK);
                 @(negedge CLK);
 
-                // Compare only the data bits [3:0], not the full output including rf_sel echo
-                // Show comparison values for first 4 and last 4 addresses
+                // Compare port A data bits [3:0]
                 $display("    addr[%0d]: fabric=0x%X gold=0x%X %s",
                          i, I_top[3:0], I_top_gold[3:0],
                          (I_top[3:0] === I_top_gold[3:0]) ? "PASS" : "FAIL");
