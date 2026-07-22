@@ -42,6 +42,21 @@ make sim
 
 **Time**: ~2-3 minutes
 
+### Configure Over UART
+
+To send the generated bitstream through the fabric's `Rx` UART port instead
+of the parallel `SelfWrite` port, run:
+
+```bash
+make uart_sim
+```
+
+This uses `sequential_16bit_en_uart_tb.v`. It sends the comload header
+`00 AA FF 02`, serializes every byte in `build/sequential_16bit_en.hex`
+unchanged over 8-N-1 UART, and then compares the configured fabric counter
+against the golden design, using the fabric's default 217 clocks per bit
+(25 MHz / 115200 baud).
+
 ## What Does This Test Do?
 
 The test verifies the functionality of a 16-bit counter with an enable signal:
