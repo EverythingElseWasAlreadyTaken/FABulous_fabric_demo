@@ -19,6 +19,7 @@ of the fabric running the bitstream against the design.
 
 Other useful make targets are:
 - `make` or `make sim` to build the bitstream, run simulation and remove all generated files afterward.
+- `make uart_sim` to configure the fabric through UART Rx and compare it against the reference design.
 - `make clean` to remove all generated files
 - `make build_test_design` to build the bitstream
 - `make run_simulation` to run the simulation

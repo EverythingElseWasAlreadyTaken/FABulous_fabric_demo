@@ -22,9 +22,11 @@ ifneq ($(wildcard ${USER_DESIGN_DIR}/custom_prims.v),)
 		CUSTOM_PRIMS=-extra-plib ${USER_DESIGN_DIR}/custom_prims.v
 endif
 
-.PHONY: all run_FABulous_demo full build_test_design run_simulation_emulation mkdir_build clean FAB_sim build_demo_fabric
+.PHONY: all uart_sim run_FABulous_demo full build_test_design run_simulation_emulation mkdir_build clean FAB_sim build_demo_fabric
 
 sim: build_test_design run_simulation clean
+
+uart_sim: build_test_design run_uart_simulation clean
 
 FAB_sim: build_demo_fabric build_test_design run_simulation clean
 
@@ -69,6 +71,10 @@ mkdir_build:
 run_simulation:
 	iverilog -s ${TESTBENCH} -o ${BUILD_DIR}/${DESIGN}.vvp ${FABRIC_FILES_DIR}/* ${USER_DESIGN_VERILOG} ${TESTBENCH}.v -g2012
 	vvp ${BUILD_DIR}/${DESIGN}.vvp ${VVP_ARGS}
+
+run_uart_simulation:
+	iverilog -s ${DESIGN}_uart_tb -o ${BUILD_DIR}/${DESIGN}_uart.vvp ${FABRIC_FILES_DIR}/* ${USER_DESIGN_VERILOG} ${DESIGN}_uart_tb.v -g2012
+	vvp ${BUILD_DIR}/${DESIGN}_uart.vvp ${VVP_ARGS}
 
 run_emulation:
 	iverilog -D EMULATION -s ${TESTBENCH} -o ${BUILD_DIR}/${DESIGN}.vvp ${BUILD_DIR}/${DESIGN}.vh ${FABRIC_FILES_DIR}/* ${USER_DESIGN_VERILOG} ${TESTBENCH}.v -g2012
